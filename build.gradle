@@ -1,0 +1,82 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.0'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.diffplug.spotless' version '6.21.0'
+}
+
+group = 'com.conversor.api'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-webflux-ui', version: '1.8.0'
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'javax.cache:cache-api:1.1.1'
+    implementation 'org.ehcache:ehcache:3.10.8'
+    implementation 'org.ehcache:ehcache-clustered:3.10.8'
+
+    // Use compileOnly para Servlet API no WebFlux para evitar erro ClassNotFound
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
+
+    // TESTES - corrigido para WireMock único e reactor-test sem duplicidade
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    testImplementation 'io.projectreactor:reactor-test:3.5.0'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Use só o wiremock-jre8 4.x que suporta Java 17 e Jakarta Servlet API
+    testImplementation 'com.github.tomakehurst:wiremock-standalone:3.0.1'
+    testImplementation 'io.projectreactor:reactor-test'
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+
+}
+
+spotless {
+    java {
+        googleJavaFormat('1.15.0')
+        importOrder()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
+check.dependsOn spotlessCheck
